@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { CurrentUser } from './auth/decorator/current-user.decorator';
+import { CognitoAuthGuard } from './auth/guard/cognito.guard';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
   @Get()
   getHello(): string {
-    return this.appService.getHello();
+    return 'Hello World!';
+  }
+
+  @Get('/user')
+  @UseGuards(CognitoAuthGuard)
+  async getUser(@CurrentUser() user: User): Promise<string> {
+    return JSON.stringify(user);
   }
 }
